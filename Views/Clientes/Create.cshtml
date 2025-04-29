@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Crear Cliente";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>Nuevo Cliente</h2>
+
+        <form id="formularioCliente">
+            <div class="mb-3">
+                <label class="form-label">Nombre:</label>
+                <input type="text" class="form-control" name="nombre" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email:</label>
+                <input type="email" class="form-control" name="email" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('formularioCliente').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            try {
+                const formData = new FormData(this);
+                const clienteData = Object.fromEntries(formData.entries());
+
+                const response = await fetch('/api/cliente', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(clienteData)
+                });
+
+                if (response.ok) {
+                    window.location.href = '/Cliente';
+                } else {
+                    alert('No se pudo crear el cliente');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Hubo un error al guardar el cliente');
+            }
+        });
+    </script>
+}

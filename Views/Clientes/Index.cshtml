@@ -1,0 +1,76 @@
+﻿@{
+    ViewData["Title"] = "Lista de Clientes";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>Gestión de Clientes</h2>
+        <a asp-action="Create" class="btn btn-primary mb-3">Nuevo Cliente</a>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="listaClientes">
+                <!-- Los datos se cargarán mediante JavaScript -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+        <script>
+            $(document).ready(function() {
+                cargarClientes();
+
+                async function cargarClientes() {
+                    try {
+                        const response = await fetch('/api/cliente');
+                        const clientes = await response.json();
+
+                        const tbody = document.getElementById('listaClientes');
+                        tbody.innerHTML = '';
+
+                        clientes.forEach(cliente => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${cliente.nombre}</td>
+                                <td>${cliente.email}</td>
+                                <td>
+                                    <a href="/Cliente/Edit/${cliente.clienteId}" class="btn btn-sm btn-primary">Editar</a>
+                                    <button onclick="eliminarCliente(${cliente.clienteId})" class="btn btn-sm btn-danger">Eliminar</button>
+                                </td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('Hubo un error al cargar los clientes');
+                    }
+                }
+
+                async function eliminarCliente(id) {
+                    if (confirm('¿Estás seguro de eliminar este cliente?')) {
+                        try {
+                            const response = await fetch(`/api/cliente/${id}`, {
+                                method: 'DELETE'
+                            });
+
+                            if (response.ok) {
+                                cargarClientes();
+                            } else {
+                                alert('No se pudo eliminar el cliente');
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            alert('Hubo un error al eliminar el cliente');
+                        }
+                    }
+                }
+            });
+        </script>
+}
